@@ -11,7 +11,8 @@ library(readxl)
 
 path.in <- "~/AAO-climate-research/Data/Raw/"
 path.out <- "~/AAO-climate-research/Data/"
-path.airports <- "~/AAO-climate-research/Data/GlobalAirportDatabase/GlobalAirportDatabase.txt"
+path.airports <- "~/AAO-climate-research/Data/OpenFlights/airports.txt"
+path.airports.supp <- "~/AAO-climate-research/Data/AAO Airport Supplement.xlsx"
 
 # From previous GAP research
 path.misqueries <- "C:/Users/Alec/Documents/GAP Research/GAP Climate Research/GeoData/GoClimate API Misqueries.xlsx"
@@ -36,6 +37,12 @@ for (sheet in raw.sheets) {
 
   setnames(raw.list[[i]], "...1", "Attendee")
 
+  # Fix data entry errors when Scott input IATA codes
+  raw.list[[i]][`Airport Code` == "KUZ"]$`Airport Code` <- "KUV"
+  raw.list[[i]][`Airport Code` == "NML"]$`Airport Code` <- "MNL"
+  raw.list[[i]][`Airport Code` == "WSX"]$`Airport Code` <- "SEA"
+  raw.list[[i]][`Airport Code` == "YWO"]$`Airport Code` <- "YYZ"
+
   i <- i + 1
 
 }
@@ -44,15 +51,29 @@ for (sheet in raw.sheets) {
 clean <- raw.list$`Airport Code - cleaned`
 
 
-# Import Partow Airport Data ----------------------------------------------
-airports.raw <- read.delim(path.airports, header = FALSE, sep = ":") %>% setDT()
+# Import OpenFlights Airport Data -----------------------------------------
+airports.raw <- fread(path.airports)
 
 # Drop extraneous columns
-airports <- airports.raw[, c(1:5, 14:16)]
+airports <- airports.raw[, -c(12:14)]
 
 # Set column names
-setnames(airports, names(airports), c("ICAO", "IATA", "Airport Name",
-  "Airport City", "Airport Country", "Altitude", "Latitude", "Longitude"))
+setnames(airports,
+  c("OpenFlights ID",
+    "Airport Name",
+    "Airport City",
+    "Airport Country",
+    "IATA",
+    "ICAO",
+    "Latitude",
+    "Longitude",
+    "Altitude",
+    "Timezone",
+    "DST")
+  )
+
+# Import Airport Supplement (Manual Research to impute OpenFlights)
+airports.supp <- read_excel(paste0(path.airports.supp)) %>% setDT()
 
 # Import Misqueries
 misqueries <- read_excel(path.misqueries, sheet = "Misqueries") %>% setDT()
@@ -62,17 +83,12 @@ misqueries <- read_excel(path.misqueries, sheet = "Misqueries") %>% setDT()
 
 airports.clean <- airports[
   # Exclude airports w/o coordinates and IATA codes
-  Latitude != 0 & Longitude != 0 & IATA != 'N/A'][
+  Latitude != 0 & Longitude != 0 & IATA != "\\N"][
     # Filter out any which cause GoClimate Misqueries
-    !(IATA %in% misqueries$IATA)][
-      # Filter out duplicated IATA codes causing issues downstream
-      !(`Airport Name` %in% c(
-        "INCIRLIK AB",
-        "ARMILLA",
-        "MALABANG",
-        "ANGEL S ADAMI")
-        )
-      ]
+    !(IATA %in% misqueries$IATA)]
+
+# Add in supplement
+airports.clean <- rbind(airports.clean, airports.supp, use.names = TRUE, fill = TRUE)
 
 
 # Hold for AAO Cleaning Section ------------------------------------------
@@ -102,4 +118,3 @@ aao.geo.unique <- unique(
 saveRDS(clean, file = paste0(path.out, "AAO_BASE_SCOTT_IATA.RDs"))
 saveRDS(aao.proxy.geocode, file = paste0(path.out, "AAO_PROXY_GEOCODE.RDs"))
 saveRDS(aao.geo.unique, file = paste0(path.out, "AAO_GEO_UNIQUE.RDs"))
-
