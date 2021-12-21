@@ -8,7 +8,6 @@ rm(list = ls())
 library(tidyverse)
 library(data.table)
 library(readxl)
-library(openxlsx)
 
 path.in <- "~/AAO-climate-research/Data/Raw/"
 path.out <- "~/AAO-climate-research/Data/"
@@ -36,5 +35,13 @@ for (sheet in raw.sheets) {
 
 }
 
+# Right now, just work w/ the already cleaned data Scott added IATA codes to
 clean <- raw.list$`Airport Code - cleaned`
+
+
+# Hold for Cleaning Section -----------------------------------------------
+
+
+# Export ------------------------------------------------------------------
+saveRDS(clean, file = paste0(path.out, "AAO_IATA.RDs"))
 
