@@ -129,7 +129,21 @@ aao.geo.unique <- unique(
   )
 
 
+
+# Compile Convention Airports ---------------------------------------------
+convention.airports <- c(
+  "ORD",
+  "MSY",
+  "LAS",
+  "MCO",
+  "SFO"
+)
+
+convention.locations <- airports.clean[IATA %in% convention.airports]
+
+
 # Export ------------------------------------------------------------------
 saveRDS(clean, file = paste0(path.out, "AAO_BASE_SCOTT_IATA.RDs"))
 saveRDS(aao.proxy.geocode, file = paste0(path.out, "AAO_PROXY_GEOCODE.RDs"))
 saveRDS(aao.geo.unique, file = paste0(path.out, "AAO_GEO_UNIQUE.RDs"))
+saveRDS(convention.locations, file = paste0(path.out, "AAO_CONVENTIONS.RDs"))

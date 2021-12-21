@@ -1,4 +1,4 @@
-# Step 03 - Flight Emissions
+# Step 04 - Flight Emissions
 # Alec Stashevsky
 # December 21, 2021
 
@@ -77,9 +77,11 @@ for (i in 1:length(query.list)) {
 }
 
 # Append to Geodata
-aao.emissions <- cbind(aao,
+aao.emissions <- cbind(
+  aao,
   Footprint = responses.footprint,
-  Offset = responses.offsets)
+  Offset = responses.offsets
+  )
 
 
 # Export ------------------------------------------------------------------
