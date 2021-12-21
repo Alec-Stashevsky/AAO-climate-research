@@ -29,7 +29,7 @@ aao <- readRDS(paste0(path.in, "AAO_GEO_UNIQUE.RDs"))
 # Plot Attendance Map -----------------------------------------------------
 
 pdf(
-  file = paste0(path.viz, "AAO Flight Networks.pdf"),
+  file = paste0(path.viz, "AAO Flight Networks2.pdf"),
   onefile = TRUE,
   width = 8,
   height = 6
@@ -58,10 +58,10 @@ map("world", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1)
 
 # Plot attendee origins (proxy via airports locations)
 points(
-  x = aao$Longitude,
-  y = aao$Latitude,
+  x = aao[Driver == 0]$Longitude,
+  y = aao[Driver == 0]$Latitude,
   pch = 20,
-  cex = log(aao$Frequency) / (max(log(aao$Frequency)) * 2),
+  cex = log(aao[Driver == 0]$Frequency) / (max(log(aao[Driver == 0]$Frequency)) * 2),
   col = rgb(red = 1, green = .69, blue = 0, alpha = 0.3)
 )
 
@@ -99,7 +99,7 @@ flight_network <- function(data, destination, rows = "default", endpts = TRUE) {
 }
 
 
-flight_network(aao, SFO)
+flight_network(aao[Driver == 0], SFO)
 
 
 # Export ------------------------------------------------------------------
