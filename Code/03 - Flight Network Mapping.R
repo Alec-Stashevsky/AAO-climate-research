@@ -1,4 +1,4 @@
-# Step 02 - Flight Network Mapping
+# Step 03 - Flight Network Mapping
 # Alec Stashevsky
 # December 20, 2021
 
@@ -23,13 +23,13 @@ path.viz <- "~/AAO-climate-research/Visualizations/"
 # Import ------------------------------------------------------------------
 
 # AAO Geo-Unique Frequency Data
-aao <- readRDS(paste0(path.in, "AAO_GEO_UNIQUE.RDs"))
+aao <- readRDS(paste0(path.in, "AAO_GEODISTANCE.RDs"))
 
 
 # Plot Attendance Map -----------------------------------------------------
 
 pdf(
-  file = paste0(path.viz, "AAO Flight Networks2.pdf"),
+  file = paste0(path.viz, "AAO Flight Networks.pdf"),
   onefile = TRUE,
   width = 8,
   height = 6
@@ -37,6 +37,11 @@ pdf(
 
 # Plot a map of the united states
 map("world", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1)
+
+title(
+  main = "AAO San Francisco Meeting Attendance Base",
+  col.main = "white", col.sub = "white"
+  )
 
 # Plot attendee origins (proxy via airports locations)
 points(
@@ -56,12 +61,17 @@ SFO <- as.numeric(aao[`Airport Code` == "SFO", .(Longitude, Latitude)])
 # Plot a map of the united states
 map("world", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1)
 
+title(
+  main = "AAO San Francisco Meeting Flight Network",
+  col.main = "white", col.sub = "white"
+)
+
 # Plot attendee origins (proxy via airports locations)
 points(
-  x = aao[Driver == 0]$Longitude,
-  y = aao[Driver == 0]$Latitude,
+  x = aao[drive.SFO == 0]$Longitude,
+  y = aao[drive.SFO == 0]$Latitude,
   pch = 20,
-  cex = log(aao[Driver == 0]$Frequency) / (max(log(aao[Driver == 0]$Frequency)) * 2),
+  cex = log(aao[drive.SFO == 0]$Frequency) / (max(log(aao[drive.SFO == 0]$Frequency)) * 2),
   col = rgb(red = 1, green = .69, blue = 0, alpha = 0.3)
 )
 
@@ -99,7 +109,7 @@ flight_network <- function(data, destination, rows = "default", endpts = TRUE) {
 }
 
 
-flight_network(aao[Driver == 0], SFO)
+flight_network(aao[drive.SFO == 0], SFO)
 
 
 # Export ------------------------------------------------------------------

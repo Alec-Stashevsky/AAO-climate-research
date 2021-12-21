@@ -104,30 +104,14 @@ aao.proxy.geocode <- merge(
   all.x = TRUE
   )
 
-# Add driver flag (per Scott's calculation) -- TODO: Perform my own calculation
-aao.proxy.geocode[, Driver := ifelse(
-  `Airport Code` %in% c(
-    "MCE",
-    "MRY",
-    "OAK",
-    "SCK",
-    "SFO",
-    "SMF",
-    "STS"
-    ),
-  1,
-  0)]
-
-
 
 # Collapse by Location (Airport as Proxy) ---------------------------------
 aao.geo.unique <- unique(
   aao.proxy.geocode[, Frequency := .N, by = .(
-    `Airport Code`, Driver, Latitude, Longitude)
+    `Airport Code`, Latitude, Longitude)
     ],
-  by = c("Airport Code", "Driver", "Latitude", "Longitude")
+  by = c("Airport Code", "Latitude", "Longitude")
   )
-
 
 
 # Compile Convention Airports ---------------------------------------------
