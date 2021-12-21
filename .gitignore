@@ -1,3 +1,9 @@
+#### Project Specific ####
+/Data
+/Data
+
+#### R Default####
+
 # History files
 .Rhistory
 .Rapp.history
