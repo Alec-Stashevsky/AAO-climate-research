@@ -5,11 +5,12 @@
 
 # Setup -------------------------------------------------------------------
 rm(list = ls())
-options(scipen = 999)
 library(tidyverse)
 library(data.table)
+library(openxlsx)
 
 path.in <- "~/AAO-climate-research/Data/"
+path.out <- "~/AAO-climate-research/Output/"
 
 
 # Import ------------------------------------------------------------------
@@ -29,34 +30,36 @@ aao[, `:=`(
   "Total Emissions SFO (Kg)" = ifelse(
     drive.SFO == 1,
     Frequency * 2 * gdist.SFO * conversion.factor, # Round trip driving emissions (Kg)
-    Frequency * Footprint.SFO
+    Frequency * Footprint.SFO                      # Round trip flying emissions (Kg)
+    ),
+
+  "Total Emissions ORD (Kg)" = ifelse(
+    drive.ORD == 1,
+    Frequency * 2 * gdist.ORD * conversion.factor,
+    Frequency * Footprint.ORD
+    ),
+
+  "Total Emissions MSY (Kg)" = ifelse(
+    drive.MSY == 1,
+    Frequency * 2 * gdist.MSY * conversion.factor,
+    Frequency * Footprint.MSY
     ),
 
   "Total Emissions LAS (Kg)" = ifelse(
     drive.LAS == 1,
-    Frequency * 2 * gdist.LAS * conversion.factor, # Round trip driving emissions (Kg)
+    Frequency * 2 * gdist.LAS * conversion.factor,
     Frequency * Footprint.LAS
-  ),
+    ),
 
   "Total Emissions MCO (Kg)" = ifelse(
     drive.MCO == 1,
-    Frequency * 2 * gdist.MCO * conversion.factor, # Round trip driving emissions (Kg)
+    Frequency * 2 * gdist.MCO * conversion.factor,
     Frequency * Footprint.MCO
-  ),
+    )
 
-  "Total Emissions MSY (Kg)" = ifelse(
-    drive.MSY == 1,
-    Frequency * 2 * gdist.MSY * conversion.factor, # Round trip driving emissions (Kg)
-    Frequency * Footprint.MSY
-  ),
-
-  "Total Emissions ORD (Kg)" = ifelse(
-    drive.ORD == 1,
-    Frequency * 2 * gdist.ORD * conversion.factor, # Round trip driving emissions (Kg)
-    Frequency * Footprint.ORD
-
-  ))]
+  )]
 
 
-
-
+# Export ------------------------------------------------------------------
+saveRDS(aao, file = paste0(path.out, "AAO Emissions.RDs"))
+write.xlsx(aao, file = paste0(path.out, "AAO Emissions.xlsx"))

@@ -39,10 +39,10 @@ drive.threshold <- 241402 # 150 miles = 241402 meters
 
 aao.geodistance[, `:=`(
   drive.SFO = ifelse(gdist.SFO <= drive.threshold, 1, 0),
-  drive.LAS = ifelse(gdist.LAS <= drive.threshold, 1, 0),
-  drive.MCO = ifelse(gdist.MCO <= drive.threshold, 1, 0),
+  drive.ORD = ifelse(gdist.ORD <= drive.threshold, 1, 0),
   drive.MSY = ifelse(gdist.MSY <= drive.threshold, 1, 0),
-  drive.ORD = ifelse(gdist.ORD <= drive.threshold, 1, 0)
+  drive.LAS = ifelse(gdist.LAS <= drive.threshold, 1, 0),
+  drive.MCO = ifelse(gdist.MCO <= drive.threshold, 1, 0)
 )]
 
 
