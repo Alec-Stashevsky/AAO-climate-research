@@ -1,6 +1,10 @@
 #### Project Specific ####
-/Data
-/Data/
+Data
+Data/
+
+Output
+Output/
+
 
 #### R Default####
 
