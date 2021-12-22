@@ -1,4 +1,4 @@
-# Step 04 - Flight Emissions
+# Step 04 - Query Flight Emissions
 # Alec Stashevsky
 # December 21, 2021
 
@@ -92,6 +92,11 @@ for (destination in conventions$IATA) {
       error = function(e) {
         print(paste0("NULL QUERY ", i))
       })
+
+    if (i %% 100) {
+      print(paste("On query", i, "of", destination))
+    }
+
   }
 
   # Coerce responses into list
