@@ -15,7 +15,6 @@ path.out <- "~/AAO-climate-research/Output/"
 
 # Import ------------------------------------------------------------------
 aao <- readRDS(paste0(path.in, "AAO_EMISSIONS.RDs"))
-conventions <- readRDS(paste0(path.in, "AAO_CONVENTIONS.RDs"))
 
 
 # Set Conversion Factors --------------------------------------------------
