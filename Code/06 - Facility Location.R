@@ -11,7 +11,7 @@ library(geosphere)
 library(maps)
 library(sp)
 
-set.seed(32)
+set.seed(32) # Needed to keep polygon consistent
 
 path.in <- "~/AAO-climate-research/Data/"
 path.out <- "~/AAO-climate-research/Output/"
@@ -24,12 +24,11 @@ aao <- readRDS(paste0(path.in, "AAO_EMISSIONS.RDs"))
 
 # Facility Location Algorithm ---------------------------------------------
 
-# Sample 30000 coordinates for initial whole-earth grid
-## This number can be increased to augment accuracy
+# Sample 50,000 coordinates for whole-earth grid, can be increased to be more precise
 coordinate.sample <- as.data.table(
   cbind(
-    lon = round(runif(30000, -180, 180), 8),
-    lat = round(runif(30000, -90, 90), 8)
+    lon = round(runif(50000, -180, 180), 8),
+    lat = round(runif(50000, -90, 90), 8)
     )
   )
 
@@ -49,14 +48,15 @@ for (i in 1:nrow(coordinate.sample)) {
 }
 
 # Sort by smallest aggregate distance
-coordinate.rank <- arrange(
-  cbind(
-    coordinate.sample,
-    "Aggregate Distance" = distance.log),
-  distance.log
-  )
-
-coordinate.rank[, Rank := seq_len(length(coordinate.sample))]
+coordinate.rank <- cbind(
+  arrange(
+    cbind(
+      coordinate.sample,
+      "Aggregate Distance" = distance.log),
+    distance.log
+    ),
+  "Rank" = 1:nrow(coordinate.sample)
+)
 
 # Create grid from 10 coordinates with the smallest Aggregate Distance
 grid <- as.matrix(rbind(
@@ -73,7 +73,6 @@ pdf(
   width = 6,
   height = 8
 )
-
 
 # Plot 15 best sample coordinates to create region of confidence
 map("state", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1
@@ -95,20 +94,21 @@ text(
   labels = coordinate.rank$Rank[1:3],
   col = "white",
   cex = 0.65,
-  pos = 4
+  pos = 1
   )
 
 # Isolate maximum bounding polygon with best 15 approximations
-target <- c(10, 2, 5, 7, 8, 9, 6)
+target <- c(10, 5, 8, 9, 6)
 
-poly.ordering <- as.matrix(rbind(
-  coordinate.rank[target[1]],
-  coordinate.rank[target[2]],
-  coordinate.rank[target[3]],
-  coordinate.rank[target[4]],
-  coordinate.rank[target[5]],
-  coordinate.rank[target[6]],
-  coordinate.rank[target[7]]))
+poly.ordering <- as.matrix(
+  rbind(
+    coordinate.rank[target[1]],
+    coordinate.rank[target[2]],
+    coordinate.rank[target[3]],
+    coordinate.rank[target[4]],
+    coordinate.rank[target[5]]
+    )
+  )
 
 # Identify the centroid/geometric median/center of mass
 region <- makePoly(poly.ordering[,1:2], sp = TRUE)
