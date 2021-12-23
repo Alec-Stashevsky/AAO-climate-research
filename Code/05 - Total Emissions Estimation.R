@@ -60,5 +60,5 @@ aao[, `:=`(
 
 
 # Export ------------------------------------------------------------------
-saveRDS(aao, file = paste0(path.out, "AAO Emissions.RDs"))
-write.xlsx(aao, file = paste0(path.out, "AAO Emissions.xlsx"))
+saveRDS(aao, file = paste0(path.out, "AAO Total Emissions.RDs"))
+write.xlsx(aao, file = paste0(path.out, "AAO Total Emissions.xlsx"))
