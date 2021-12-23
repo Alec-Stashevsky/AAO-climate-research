@@ -11,18 +11,18 @@ library(geosphere)
 library(maps)
 library(sp)
 
+set.seed(32)
+
 path.in <- "~/AAO-climate-research/Data/"
 path.out <- "~/AAO-climate-research/Output/"
+path.viz <- "~/AAO-climate-research/Visualizations/"
 
 
 # Import ------------------------------------------------------------------
 aao <- readRDS(paste0(path.in, "AAO_EMISSIONS.RDs"))
-# conventions <- readRDS(paste0(path.in, "AAO_CONVENTIONS.RDs"))
 
 
 # Facility Location Algorithm ---------------------------------------------
-
-# Latitudes range from [-90, 90] and longitudes ranges from [-180, 180]. Here we create an algorithm to identify the optimal conference location based on the AAO Annual Meetings geographic makeup of attendees.
 
 # Sample 30000 coordinates for initial whole-earth grid
 ## This number can be increased to augment accuracy
@@ -59,13 +59,74 @@ coordinate.rank <- arrange(
 coordinate.rank[, Rank := seq_len(length(coordinate.sample))]
 
 # Create grid from 10 coordinates with the smallest Aggregate Distance
-grid.nyc <- as.matrix(rbind(
-  c(min(coordinate.rank$lon[1:10]),
-    min(coordinate.rank$lat[1:10])),
-  c(max(coordinate.rank$lon[1:10]),
-    max(coordinate.rank$lat[1:10]))))
+grid <- as.matrix(rbind(
+  c(min(coordinate.rank$lon[1:30]),
+    min(coordinate.rank$lat[1:30])),
+  c(max(coordinate.rank$lon[1:30]),
+    max(coordinate.rank$lat[1:30]))))
 
 
 # Plot Region of Optimal Location -----------------------------------------
+pdf(
+  file = paste0(path.viz, "AAO Facility Location Results.pdf"),
+  onefile = TRUE,
+  width = 6,
+  height = 8
+)
 
 
+# Plot 15 best sample coordinates to create region of confidence
+map("state", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1
+  ,
+  xlim = c(grid[1,1] - 3, grid[2,1] + 4),
+  ylim = c(grid[1,2] - 3, grid[2,2] + 4)
+  )
+
+points(
+  x = coordinate.rank$lon[1:3],
+  y = coordinate.rank$lat[1:3],
+  col = "orange red",
+  pch = 10, cex = 1
+  )
+
+text(
+  x = coordinate.rank$lon[1:3],
+  y = coordinate.rank$lat[1:3],
+  labels = coordinate.rank$Rank[1:3],
+  col = "white",
+  cex = 0.65,
+  pos = 4
+  )
+
+# Isolate maximum bounding polygon with best 15 approximations
+target <- c(10, 2, 5, 7, 8, 9, 6)
+
+poly.ordering <- as.matrix(rbind(
+  coordinate.rank[target[1]],
+  coordinate.rank[target[2]],
+  coordinate.rank[target[3]],
+  coordinate.rank[target[4]],
+  coordinate.rank[target[5]],
+  coordinate.rank[target[6]],
+  coordinate.rank[target[7]]))
+
+# Identify the centroid/geometric median/center of mass
+region <- makePoly(poly.ordering[,1:2], sp = TRUE)
+center <- centroid(region)
+
+# Draw polygon
+polygon(
+  poly.ordering,
+  col = rgb(red = 1, green = 140/255, blue = 0, alpha = 0.25),
+  border = "orange"
+  )
+
+# Add centroid
+points(x = center[1], y= center[2], col = "gold", pch = 3)
+
+# Add plot aesthetics
+title(main = "AAO Meeting Optimal Location Region", col.main = "white")
+
+
+# Export ------------------------------------------------------------------
+dev.off()
