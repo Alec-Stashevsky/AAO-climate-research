@@ -1,4 +1,4 @@
-# Step 01 - Regional Analysis
+# Step 01 - Regional Configuration Analysis
 # Alec Stashevsky
 # January 6, 2022
 
@@ -40,12 +40,12 @@ aao[, `:=`(
   regional_LAS_MCO = ifelse(gdist.LAS < gdist.MCO, "LAS", "MCO")
   )]
 
-# Calculate total geodesic distance for each coordinate in sample
 distance.log <- data.table(
   "Configuration" = colnames(aao)[(ncol(aao) - 5):ncol(aao)],
   "Aggregate Distance" = rep(NA, nrow(conf.grid))
 )
 
+# Calculate total geodesic distance for each coordinate in sample
 for (i in 1:nrow(conf.grid)) {
 
   distance.log$`Aggregate Distance`[i] <- sum(
@@ -103,3 +103,10 @@ for (i in 1:nrow(conf.grid)) {
   )
 }
 
+# Add % difference and sort
+distance.log <- arrange(
+  distance.log[,
+  `Percent Change` := (`Aggregate Distance` - first(`Aggregate Distance`)) / first(`Aggregate Distance`)
+  ],
+  `Aggregate Distance`
+)
