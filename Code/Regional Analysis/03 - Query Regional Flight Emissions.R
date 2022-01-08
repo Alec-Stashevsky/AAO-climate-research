@@ -129,3 +129,12 @@ for (fmt in 1:length(response.list)) {
   )
 
 }
+
+
+# Append to Geodata
+aao.emissions <- cbind(aao, bind_cols(response.list))
+
+
+# Export ------------------------------------------------------------------
+saveRDS(aao.emissions, file = paste0(path.in, "AAO_REGIONAL_EMISSIONS.RDs"))
+openxlsx::write.xlsx(aao.emissions, file = paste0(path.out, "AAO_REGIONAL_EMISSIONS.xlsx"))
