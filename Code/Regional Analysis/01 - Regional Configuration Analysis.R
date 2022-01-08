@@ -11,7 +11,6 @@ library(geosphere)
 library(matrixStats)
 
 path.in <- "~/AAO-climate-research/Data/"
-# path.viz <- "~/AAO-climate-research/Visualizations/"
 
 
 # Import ------------------------------------------------------------------
