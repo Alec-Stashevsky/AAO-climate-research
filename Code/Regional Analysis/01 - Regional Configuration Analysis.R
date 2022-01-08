@@ -296,3 +296,57 @@ distance.log2 <- arrange(
 
 # Drop every other row
 distance.log2 <- distance.log2[seq(1, nrow(distance.log2), 2)]
+
+
+# Encode Regional Destination ---------------------------------------------
+aao[, `:=`(
+
+  # Use SFO and ORD
+  `Regional Format 1` = ifelse(gdist.SFO < gdist.ORD, "SFO", "ORD"),
+
+  # Use SFO, ORD, and MCO
+  `Regional Format 2` = fcase(
+
+    # IF SFO is min
+    gdist.SFO == rowMins(
+      as.matrix(
+        data.frame(
+          gdist.SFO,
+          gdist.ORD,
+          gdist.MCO
+          )
+        )
+      ), "SFO",
+
+    # If ORD is min
+    gdist.ORD == rowMins(
+      as.matrix(
+        data.frame(
+          gdist.SFO,
+          gdist.ORD,
+          gdist.MCO
+        )
+      )
+    ), "ORD",
+
+    # If MCO is min
+    gdist.MCO == rowMins(
+      as.matrix(
+        data.frame(
+          gdist.SFO,
+          gdist.ORD,
+          gdist.MCO
+        )
+      )
+    ), "MCO"
+
+  )
+)]
+
+# Drop configuration columns
+
+aao[, grep("regional_", colnames(aao)) := NULL]
+
+
+# Export ------------------------------------------------------------------
+saveRDS(aao, file = paste0(path.in, "AAO_REGIONAL_CONFIG.RDs"))
