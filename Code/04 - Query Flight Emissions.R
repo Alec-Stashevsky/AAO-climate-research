@@ -25,7 +25,6 @@ conventions <- readRDS(paste0(path.in, "AAO_CONVENTIONS.RDs"))
 
 # Set Query Parameters
 seat.class <- "economy" # Assume most people will fly economy class
-# destination <- "SFO"
 
 # Extract origin IATA
 origins <- aao$`Airport Code`
@@ -94,8 +93,9 @@ for (destination in conventions$IATA) {
         print(paste0("NULL QUERY ", i))
       })
 
-    if (i %% 100) {
-      print(paste("On query", i, "of", destination))
+    # Add status output
+    if (i %% 100 == 0) {
+      print(paste("On query", i, "of destination", destination))
     }
 
   }
