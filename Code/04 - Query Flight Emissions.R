@@ -122,4 +122,5 @@ aao.emissions <- cbind(aao, bind_cols(response.list))
 
 # Export ------------------------------------------------------------------
 saveRDS(aao.emissions, file = paste0(path.in, "AAO_EMISSIONS.RDs"))
-openxlsx::write.xlsx(aao.emissions, file = paste0(path.out, "AAO_EMISSIONS.xlsx"))
+openxlsx::write.xlsx(aao.emissions, file = paste0(path.out, "AAO_EMISSIONS.xlsx"),
+  overwrite = TRUE)
