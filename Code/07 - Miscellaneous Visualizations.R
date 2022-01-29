@@ -77,9 +77,11 @@ text(
   col = "white", cex = 0.21, pos = 1, offset = 0.15
 )
 
+# Export
+dev.off()
 
 
-# Cumulative Footprint and Travel Distance Plots -------------------------
+# Cumulative Footprint / Travel Distance Plot Data Preparation ------------
 
 # Expand data by frequency column
 aao.final.expanded <- aao.final[, `:=`(
@@ -90,12 +92,31 @@ aao.final.expanded <- aao.final[, `:=`(
   PC.Footprint.ORD = `Total Emissions ORD (Kg)` / Frequency
   )][rep(seq(.N), Frequency), !"Frequency"]
 
+# Coalesce travel distance in one column for plotting
+aao.final.regional.expanded <- aao.final.regional[, `:=`(
+  "PC.Footprint.1" = `Total Emissions Format 1 (Kg)` / Frequency,
+  "PC.Footprint.2" = `Total Emissions Format 2 (Kg)` / Frequency
+)][rep(seq(.N), Frequency), !"Frequency"][, `:=`(
+  gdist.1 = fcase(
+    `Regional Format 1` == "SFO", gdist.SFO,
+    `Regional Format 1` == "ORD", gdist.ORD
+    ),
+  gdist.2 = fcase(
+    `Regional Format 2` == "SFO", gdist.SFO,
+    `Regional Format 2` == "ORD", gdist.ORD,
+    `Regional Format 2` == "MCO", gdist.MCO
+  )
+)]
 
+
+# Build Plotting Function -------------------------------------------------
 emissions_plot <- function(
   data,
   region,
   offset = 0,
-  binwidth = 600
+  binwidth = 600,
+  legend.position = "bottom",
+  title = NULL
   ){
 
   # Plot initial histogram
@@ -103,13 +124,16 @@ emissions_plot <- function(
     geom_histogram(
       data = data,
       aes(x = get(paste0("gdist.", region)) / 1000),
-      binwidth = binwidth,
-      col = "gray28"
+      binwidth = binwidth
     )
 
   # Build data behind plot
   p.build <- ggplot_build(p)
 
+  # Set title
+  if (is.null(title)) {
+    title <- paste0("Conference Location: ", region)
+  }
 
   #### Calculate Scaling Parameters ####
 
@@ -117,7 +141,7 @@ emissions_plot <- function(
   max.bar.height <- round(max(p.build[["data"]][[1]][["y"]]), digits = -3)
 
   # Total Emissions for region
-  total.emissions <- sum(aao.final.expanded[, .(get(paste0("PC.Footprint.", region)))])
+  total.emissions <- sum(data[, .(get(paste0("PC.Footprint.", region)))])
 
   # Scaling Parameters
   cumsum_coef <- total.emissions / max.bar.height
@@ -127,9 +151,10 @@ emissions_plot <- function(
   ggplot() +
     geom_histogram(
       data = data,
-      aes(x = get(paste0("gdist.", region)) / 1000),
+      aes(x = get(paste0("gdist.", region)) / 1000, fill = "Number of Attendees"),
       binwidth = binwidth,
-      col = "gray28"
+      col = "gray28",
+      alpha = 0.4
     ) +
     geom_line(
       data = data[
@@ -137,66 +162,47 @@ emissions_plot <- function(
         .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
           "Distance" = get(paste0("gdist.", region)))
       ],
-      aes(x = Distance / 1000, y = CumSum),
-      col = "salmon"
+      aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+      size = 1.5,
+      alpha = 0.6
+
     ) +
     scale_x_continuous(
-      name = "One-way Travel Distance (km)",
+      name = "Distance to Conference (km)",
       labels = scales::label_comma()
     ) +
     scale_y_continuous(
       name = "Number of Attendees",
       labels = scales::label_comma(),
+      breaks = seq(from = 0, to = max.bar.height, by = 1000),
       sec.axis = sec_axis(
         trans = ~.*sec_axis_trans,
         name = "Cummulative CO2 Emissions",
         labels = scales::label_percent())
     ) +
-    ggtitle(paste0("Conference Location: ", region))
-
+    scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
+    scale_fill_manual(name = "", values = c("Number of Attendees" = "lightblue")) +
+    ggtitle(title) +
+    theme(legend.position = legend.position)
 }
 
 
-
 # Output Plots ------------------------------------------------------------
+
+# Initialize write to pdf
+pdf(file = paste0(path.viz,"AAO Cummulative Footprint Plots.pdf"),
+  width = 8, height = 6)
+
+# Single-meeting plots
 emissions_plot(aao.final.expanded, "SFO")
 emissions_plot(aao.final.expanded, "LAS")
 emissions_plot(aao.final.expanded, "MCO")
 emissions_plot(aao.final.expanded, "MSY")
 emissions_plot(aao.final.expanded, "ORD", offset = 18) # Needed to fix second y-axis labels
 
+# Regional format plots
+emissions_plot(aao.final.regional.expanded, "1", title = "Regional Format 1")
+emissions_plot(aao.final.regional.expanded, "2", title = "Regional Format 2")
 
-# OLD ----
-# ggplot() +
-#   geom_histogram(
-#     data = aao.final.expanded,
-#     aes(x = gdist.ORD/1000),
-#     binwidth = 600,
-#     col = "gray28"
-#     ) +
-#   geom_line(
-#     data = aao.final.expanded[
-#       order(gdist.ORD), CumSum := cumsum(PC.Footprint.ORD / 5275)
-#       ],
-#     aes(x = gdist.ORD/1000, y = CumSum),
-#     col = "salmon"
-#     ) +
-#   scale_x_continuous(
-#     name = "One-way Travel Distance (km)",
-#     labels = scales::label_comma()
-#     ) +
-#   scale_y_continuous(
-#     name = "Number of Attendees",
-#     labels = scales::label_comma(),
-#     sec.axis = sec_axis(
-#       trans= ~.* (1/6018),
-#       name = "Cummulative CO2 Emissions",
-#       labels = scales::label_percent())
-#     )
-
-
-
-
-
-# Export ------------------------------------------------------------------
+# Export
 dev.off()
