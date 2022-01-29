@@ -116,7 +116,8 @@ emissions_plot <- function(
   offset = 0,
   binwidth = 600,
   legend.position = "bottom",
-  title = NULL
+  title = NULL,
+  regional = FALSE
   ){
 
   # Plot initial histogram
@@ -147,43 +148,92 @@ emissions_plot <- function(
   cumsum_coef <- total.emissions / max.bar.height
   sec_axis_trans <- 1 / (max.bar.height + offset)
 
-  # Output actual plot
-  ggplot() +
-    geom_histogram(
-      data = data,
-      aes(x = get(paste0("gdist.", region)) / 1000, fill = "Number of Attendees"),
-      binwidth = binwidth,
-      col = "gray28",
-      alpha = 0.4
-    ) +
-    geom_line(
-      data = data[
-        order(get(paste0("gdist.", region))),
-        .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
-          "Distance" = get(paste0("gdist.", region)))
-      ],
-      aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
-      size = 1.5,
-      alpha = 0.6
 
-    ) +
-    scale_x_continuous(
-      name = "Distance to Conference (km)",
-      labels = scales::label_comma()
-    ) +
-    scale_y_continuous(
-      name = "Number of Attendees",
-      labels = scales::label_comma(),
-      breaks = seq(from = 0, to = max.bar.height, by = 1000),
-      sec.axis = sec_axis(
-        trans = ~.*sec_axis_trans,
-        name = "Cummulative CO2 Emissions",
-        labels = scales::label_percent())
-    ) +
-    scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
-    scale_fill_manual(name = "", values = c("Number of Attendees" = "lightblue")) +
-    ggtitle(title) +
-    theme(legend.position = legend.position)
+  if (regional) {
+
+    # Output actual plot
+    ggplot() +
+      geom_histogram(
+        data = data,
+        aes(
+          x = get(paste0("gdist.", region)) / 1000,
+          fill = get(paste0("Regional Format ", region))
+          ),
+        binwidth = binwidth,
+        col = "gray28",
+        alpha = 0.4
+      ) +
+      geom_line(
+        data = data[
+          order(get(paste0("gdist.", region))),
+          .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
+            "Distance" = get(paste0("gdist.", region)))
+        ],
+        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        size = 1.5,
+        alpha = 0.6
+
+      ) +
+      scale_x_continuous(
+        name = "Distance to Conference (km)",
+        labels = scales::label_comma()
+      ) +
+      scale_y_continuous(
+        name = "Number of Attendees",
+        labels = scales::label_comma(),
+        breaks = seq(from = 0, to = max.bar.height, by = 1000),
+        sec.axis = sec_axis(
+          trans = ~.*sec_axis_trans,
+          name = "Cummulative CO2 Emissions",
+          labels = scales::label_percent())
+      ) +
+      scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
+      scale_fill_manual(name = "Number of Attendees", values = c("ORD" = "salmon", "SFO" = "cyan")) +
+      ggtitle(title) +
+      theme(legend.position = legend.position)
+
+
+  } else {
+
+    # Output actual plot
+    ggplot() +
+      geom_histogram(
+        data = data,
+        aes(x = get(paste0("gdist.", region)) / 1000, fill = "Number of Attendees"),
+        binwidth = binwidth,
+        col = "gray28",
+        alpha = 0.4
+      ) +
+      geom_line(
+        data = data[
+          order(get(paste0("gdist.", region))),
+          .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
+            "Distance" = get(paste0("gdist.", region)))
+        ],
+        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        size = 1.5,
+        alpha = 0.6
+
+      ) +
+      scale_x_continuous(
+        name = "Distance to Conference (km)",
+        labels = scales::label_comma()
+      ) +
+      scale_y_continuous(
+        name = "Number of Attendees",
+        labels = scales::label_comma(),
+        breaks = seq(from = 0, to = max.bar.height, by = 1000),
+        sec.axis = sec_axis(
+          trans = ~.*sec_axis_trans,
+          name = "Cummulative CO2 Emissions",
+          labels = scales::label_percent())
+      ) +
+      scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
+      scale_fill_manual(name = "", values = c("Number of Attendees" = "lightblue")) +
+      ggtitle(title) +
+      theme(legend.position = legend.position)
+
+  }
 }
 
 
@@ -201,7 +251,12 @@ emissions_plot(aao.final.expanded, "MSY")
 emissions_plot(aao.final.expanded, "ORD", offset = 18) # Needed to fix second y-axis labels
 
 # Regional format plots
-emissions_plot(aao.final.regional.expanded, "1", title = "Regional Format 1")
+emissions_plot(
+  aao.final.regional.expanded,
+  "1",
+  regional = TRUE,
+  title = "Regional Format 1"
+  )
 emissions_plot(aao.final.regional.expanded, "2", title = "Regional Format 2")
 
 # Export
