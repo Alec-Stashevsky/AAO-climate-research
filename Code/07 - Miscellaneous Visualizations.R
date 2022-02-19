@@ -94,8 +94,14 @@ aao.final.expanded <- aao.final[, `:=`(
 
 # Coalesce travel distance in one column for plotting
 aao.final.regional.expanded <- aao.final.regional[, `:=`(
+  # Code as factor variables to keep legend consistent
+  `Regional Format 1` = factor(`Regional Format 1`, levels = c("ORD", "SFO"), ordered = TRUE),
+  `Regional Format 2` = factor(`Regional Format 2`, levels = c("MCO", "ORD", "SFO"), ordered = TRUE),
+
+  # Per capita Footprint
   "PC.Footprint.1" = `Total Emissions Format 1 (Kg)` / Frequency,
   "PC.Footprint.2" = `Total Emissions Format 2 (Kg)` / Frequency
+
 )][rep(seq(.N), Frequency), !"Frequency"][, `:=`(
   gdist.1 = fcase(
     `Regional Format 1` == "SFO", gdist.SFO,
@@ -118,7 +124,7 @@ emissions_plot <- function(
   legend.position = "bottom",
   title = NULL,
   regional = FALSE
-  ){
+  ) {
 
   # Plot initial histogram
   p <- ggplot() +
@@ -148,8 +154,28 @@ emissions_plot <- function(
   cumsum_coef <- total.emissions / max.bar.height
   sec_axis_trans <- 1 / (max.bar.height + offset)
 
+  #### Build Plots ####
 
-  if (regional) {
+  # Regional Format 1
+  if (regional & region == "1") {
+
+    # Text annotation
+    label <- paste0(
+      "list(",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        1,
+        2
+        ),
+      ",",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        3,
+        5
+      ),
+      ") ",
+      expression(~tCO[2]*italic("e"))
+    )
 
     # Output actual plot
     ggplot() +
@@ -161,7 +187,7 @@ emissions_plot <- function(
           ),
         binwidth = binwidth,
         col = "gray28",
-        alpha = 0.4
+        alpha = 0.75
       ) +
       geom_line(
         data = data[
@@ -171,8 +197,13 @@ emissions_plot <- function(
         ],
         aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
         size = 1.5,
-        alpha = 0.6
-
+        alpha = 1
+      ) +
+      geom_text(
+        aes(x = 15000, y = max.bar.height),
+        label = label,
+        parse = TRUE,
+        nudge_y = 250
       ) +
       scale_x_continuous(
         name = "Distance to Conference (km)",
@@ -184,25 +215,137 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = "Cummulative CO2 Emissions",
+          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
           labels = scales::label_percent())
       ) +
-      scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
-      scale_fill_manual(name = "Number of Attendees", values = c("ORD" = "salmon", "SFO" = "cyan")) +
+      scale_color_manual(
+        name = " ",
+        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        values = c("gray28")
+      ) +
+      scale_fill_manual(
+        name = "Attendance at:",
+        labels = c("San Francisco", "Chicago"),
+        values = c("SFO" = "#26828e", "ORD" = "#6ece58")
+        ) +
+      guides(
+        fill  = guide_legend(order = 1, title.position = "top", title.hjust = 0.5),
+        color = guide_legend(order = 2, title.position = "top")
+        ) +
       ggtitle(title) +
+      theme_minimal() +
+      theme(legend.position = legend.position)
+
+
+  } else if (regional & region == "2") {
+
+    # Text annotation
+    label <- paste0(
+      "list(",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        1,
+        2
+      ),
+      ",",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        3,
+        5
+      ),
+      ") ",
+      expression(~tCO[2]*italic("e"))
+    )
+
+    # Regional Format 2
+    ggplot() +
+      geom_histogram(
+        data = data,
+        aes(
+          x = get(paste0("gdist.", region)) / 1000,
+          fill = get(paste0("Regional Format ", region))
+        ),
+        binwidth = binwidth,
+        col = "gray28",
+        alpha = 0.75
+      ) +
+      geom_line(
+        data = data[
+          order(get(paste0("gdist.", region))),
+          .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
+            "Distance" = get(paste0("gdist.", region)))
+        ],
+        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        size = 1.5,
+        alpha = 1
+
+      ) +
+      geom_text(
+        aes(x = 15000, y = max.bar.height),
+        label = label,
+        parse = TRUE,
+        nudge_y = 250
+        ) +
+      scale_x_continuous(
+        name = "Distance to Conference (km)",
+        labels = scales::label_comma()
+      ) +
+      scale_y_continuous(
+        name = "Number of Attendees",
+        labels = scales::label_comma(),
+        breaks = seq(from = 0, to = max.bar.height, by = 1000),
+        sec.axis = sec_axis(
+          trans = ~.*sec_axis_trans,
+          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
+          labels = scales::label_percent())
+      ) +
+      scale_color_manual(
+        name = " ",
+        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        values = c("gray28")
+        ) +
+      scale_fill_manual(
+        name = "Attendance at:",
+        labels = c("San Francisco", "Chicago", "Orlando"),
+        values = c("SFO" = "#26828e", "ORD" = "#6ece58", "MCO" = "#fde725")
+        ) +
+      guides(
+        fill  = guide_legend(order = 1, title.position = "top", title.hjust = 0.5),
+        color = guide_legend(order = 2, title.position = "top", title.hjust = 0.5)
+      ) +
+      ggtitle(title) +
+      theme_minimal() +
       theme(legend.position = legend.position)
 
 
   } else {
 
-    # Output actual plot
+    # Text annotation
+    label <- paste0(
+      "list(",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        1,
+        2
+      ),
+      ",",
+      substr(
+        round(as.numeric(data[, .(sum(get(paste0("PC.Footprint.", region))))]) / 1000),
+        3,
+        5
+      ),
+      ") ",
+      expression(~tCO[2]*italic("e"))
+    )
+
+    # Single-Meeting format
     ggplot() +
       geom_histogram(
         data = data,
-        aes(x = get(paste0("gdist.", region)) / 1000, fill = "Number of Attendees"),
+        aes(x = get(paste0("gdist.", region)) / 1000, fill = region),
         binwidth = binwidth,
         col = "gray28",
-        alpha = 0.4
+        alpha = 0.75
       ) +
       geom_line(
         data = data[
@@ -212,8 +355,14 @@ emissions_plot <- function(
         ],
         aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
         size = 1.5,
-        alpha = 0.6
+        alpha = 1
 
+      ) +
+      geom_text(
+        aes(x = 17000, y = max.bar.height),
+        label = label,
+        parse = TRUE,
+        nudge_y = 250
       ) +
       scale_x_continuous(
         name = "Distance to Conference (km)",
@@ -225,12 +374,25 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = "Cummulative CO2 Emissions",
+          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
           labels = scales::label_percent())
       ) +
-      scale_color_manual(name = "", values = c("Cummulative C02 Emissions" = "darkred")) +
-      scale_fill_manual(name = "", values = c("Number of Attendees" = "lightblue")) +
+      scale_color_manual(
+        name = " ",
+        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        values = c("gray28")
+      ) +
+      scale_fill_manual(
+        name = "Attendance at:",
+        labels = conventions[IATA == region]$`Airport City`,
+        values = c(assign(region, "lightblue"))
+        ) +
+      guides(
+        fill  = guide_legend(order = 1, title.position = "top"),
+        color = guide_legend(order = 2, title.position = "top")
+        ) +
       ggtitle(title) +
+      theme_minimal() +
       theme(legend.position = legend.position)
 
   }
@@ -257,7 +419,11 @@ emissions_plot(
   regional = TRUE,
   title = "Regional Format 1"
   )
-emissions_plot(aao.final.regional.expanded, "2", title = "Regional Format 2")
+emissions_plot(
+  aao.final.regional.expanded,
+  "2",
+  regional = TRUE,
+  title = "Regional Format 2")
 
 # Export
 dev.off()
