@@ -174,7 +174,7 @@ emissions_plot <- function(
         5
       ),
       ") ",
-      expression(~tCO[2]*italic("e"))
+      expression(~tCO[2])
     )
 
     # Output actual plot
@@ -215,12 +215,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
+          name = expression(Cummulative~tCO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        labels = expression(Cummulative~tCO[2]~Emissions),
         values = c("gray28")
       ) +
       scale_fill_manual(
@@ -254,7 +254,7 @@ emissions_plot <- function(
         5
       ),
       ") ",
-      expression(~tCO[2]*italic("e"))
+      expression(~tCO[2])
     )
 
     # Regional Format 2
@@ -296,12 +296,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
+          name = expression(Cummulative~tCO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        labels = expression(Cummulative~tCO[2]~Emissions),
         values = c("gray28")
         ) +
       scale_fill_manual(
@@ -335,7 +335,7 @@ emissions_plot <- function(
         5
       ),
       ") ",
-      expression(~tCO[2]*italic("e"))
+      expression(~tCO[2])
     )
 
     # Single-Meeting format
@@ -374,12 +374,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~CO[2]*italic("e")~Emissions),
+          name = expression(Cummulative~tCO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~CO[2]*italic("e")~Emissions),
+        labels = expression(Cummulative~tCO[2]~Emissions),
         values = c("gray28")
       ) +
       scale_fill_manual(
