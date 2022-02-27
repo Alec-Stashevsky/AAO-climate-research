@@ -23,21 +23,30 @@ grams.to.kg <- 0.001
 car.emissons.grams.per.mile <- 404
 conversion.factor <- meter.to.mile * car.emissons.grams.per.mile * grams.to.kg
 
+accomdation.dist <- 17707 # Geodesic distance between SFO and OAK is used
 
 # Calculate Total Emissions -----------------------------------------------
 aao[, `:=`(
   "Total Emissions Format 1 (Kg)" = fcase(
 
+    # SFO Drivers - No Accommodation
+    `Regional Format 1` == "SFO" & drive.SFO == 1 & gdist.SFO < accomdation.dist,
+    Frequency * 2 * gdist.SFO * conversion.factor * 4, # Round trip driving emissions (Kg)
+
     # SFO Drivers
-    `Regional Format 1` == "SFO" & drive.SFO == 1,
+    `Regional Format 1` == "SFO" & drive.SFO == 1 & gdist.SFO >= accomdation.dist,
     Frequency * 2 * gdist.SFO * conversion.factor, # Round trip driving emissions (Kg)
 
     # SFO Flyers
     `Regional Format 1` == "SFO" & drive.SFO == 0,
     Frequency * Footprint.Format1,                 # Round trip flying emissions (Kg)
 
+    # ORD Drivers - No Accommodation
+    `Regional Format 1` == "ORD" & drive.ORD == 1 & gdist.ORD < accomdation.dist,
+    Frequency * 2 * gdist.ORD * conversion.factor * 4, # Round trip driving emissions (Kg)
+
     # ORD Drivers
-    `Regional Format 1` == "ORD" & drive.ORD == 1,
+    `Regional Format 1` == "ORD" & drive.ORD == 1 & gdist.ORD >= accomdation.dist,
     Frequency * 2 * gdist.ORD * conversion.factor, # Round trip driving emissions (Kg)
 
     # ORD Flyers
@@ -48,24 +57,36 @@ aao[, `:=`(
 
   "Total Emissions Format 2 (Kg)" = fcase(
 
+    # SFO Drivers - No Accommodation
+    `Regional Format 2` == "SFO" & drive.SFO == 1 & gdist.SFO < accomdation.dist,
+    Frequency * 2 * gdist.SFO * conversion.factor * 4, # Round trip driving emissions (Kg)
+
     # SFO Drivers
-    `Regional Format 2` == "SFO" & drive.SFO == 1,
+    `Regional Format 2` == "SFO" & drive.SFO == 1 & gdist.SFO >= accomdation.dist,
     Frequency * 2 * gdist.SFO * conversion.factor, # Round trip driving emissions (Kg)
 
     # SFO Flyers
     `Regional Format 2` == "SFO" & drive.SFO == 0,
     Frequency * Footprint.Format2,                 # Round trip flying emissions (Kg)
 
+    # ORD Drivers - No Accommodation
+    `Regional Format 2` == "ORD" & drive.ORD == 1 & gdist.ORD < accomdation.dist,
+    Frequency * 2 * gdist.ORD * conversion.factor * 4, # Round trip driving emissions (Kg)
+
     # ORD Drivers
-    `Regional Format 2` == "ORD" & drive.ORD == 1,
+    `Regional Format 2` == "ORD" & drive.ORD == 1 & gdist.ORD >= accomdation.dist,
     Frequency * 2 * gdist.ORD * conversion.factor, # Round trip driving emissions (Kg)
 
     # ORD Flyers
     `Regional Format 2` == "ORD" & drive.ORD == 0,
     Frequency * Footprint.Format2,                 # Round trip flying emissions (Kg)
 
+    # MCO Drivers - No Accommodation
+    `Regional Format 2` == "MCO" & drive.MCO == 1 & gdist.MCO < accomdation.dist,
+    Frequency * 2 * gdist.MCO * conversion.factor * 4, # Round trip driving emissions (Kg)
+
     # MCO Drivers
-    `Regional Format 2` == "MCO" & drive.MCO == 1,
+    `Regional Format 2` == "MCO" & drive.MCO == 1 & gdist.MCO >= accomdation.dist,
     Frequency * 2 * gdist.MCO * conversion.factor, # Round trip driving emissions (Kg)
 
     # MCO Flyers
