@@ -23,40 +23,80 @@ grams.to.kg <- 0.001
 car.emissons.grams.per.mile <- 404
 conversion.factor <- meter.to.mile * car.emissons.grams.per.mile * grams.to.kg
 
+accomdation.dist <- 17707 # Geodesic distance between SFO and OAK is used
 
 # Calculate Total Emissions -----------------------------------------------
 aao[, `:=`(
-  "Total Emissions SFO (Kg)" = ifelse(
-    drive.SFO == 1,
-    Frequency * 2 * gdist.SFO * conversion.factor, # Round trip driving emissions (Kg)
-    Frequency * Footprint.SFO                      # Round trip flying emissions (Kg)
+  "Total Emissions SFO (Kg)" = fcase(
+    # Round trip driving emissions for 4 trips (Kg)
+    drive.SFO == 1 & gdist.SFO < accomdation.dist,
+    Frequency * 2 * gdist.SFO * conversion.factor * 4,
+
+    # Round trip driving emissions for 1 trip (Kg)
+    drive.SFO == 1 & gdist.SFO >=accomdation.dist,
+    Frequency * 2 * gdist.SFO * conversion.factor,
+
+    # Round trip flying emissions (Kg)
+    drive.SFO == 0,
+    Frequency * Footprint.SFO
     ),
 
-  "Total Emissions ORD (Kg)" = ifelse(
-    drive.ORD == 1,
+  "Total Emissions ORD (Kg)" = fcase(
+    # Round trip driving emissions for 4 trips (Kg)
+    drive.ORD == 1 & gdist.ORD < accomdation.dist,
+    Frequency * 2 * gdist.ORD * conversion.factor * 4,
+
+    # Round trip driving emissions for 1 trip (Kg)
+    drive.ORD == 1 & gdist.ORD >=accomdation.dist,
     Frequency * 2 * gdist.ORD * conversion.factor,
+
+    # Round trip flying emissions (Kg)
+    drive.ORD == 0,
     Frequency * Footprint.ORD
-    ),
+  ),
 
-  "Total Emissions MSY (Kg)" = ifelse(
-    drive.MSY == 1,
+  "Total Emissions MSY (Kg)" = fcase(
+    # Round trip driving emissions for 4 trips (Kg)
+    drive.MSY == 1 & gdist.MSY < accomdation.dist,
+    Frequency * 2 * gdist.MSY * conversion.factor * 4,
+
+    # Round trip driving emissions for 1 trip (Kg)
+    drive.MSY == 1 & gdist.MSY >=accomdation.dist,
     Frequency * 2 * gdist.MSY * conversion.factor,
+
+    # Round trip flying emissions (Kg)
+    drive.MSY == 0,
     Frequency * Footprint.MSY
-    ),
+  ),
 
-  "Total Emissions LAS (Kg)" = ifelse(
-    drive.LAS == 1,
+  "Total Emissions LAS (Kg)" = fcase(
+    # Round trip driving emissions for 4 trips (Kg)
+    drive.LAS == 1 & gdist.LAS < accomdation.dist,
+    Frequency * 2 * gdist.LAS * conversion.factor * 4,
+
+    # Round trip driving emissions for 1 trip (Kg)
+    drive.LAS == 1 & gdist.LAS >=accomdation.dist,
     Frequency * 2 * gdist.LAS * conversion.factor,
+
+    # Round trip flying emissions (Kg)
+    drive.LAS == 0,
     Frequency * Footprint.LAS
-    ),
+  ),
 
-  "Total Emissions MCO (Kg)" = ifelse(
-    drive.MCO == 1,
+  "Total Emissions MCO (Kg)" = fcase(
+    # Round trip driving emissions for 4 trips (Kg)
+    drive.MCO == 1 & gdist.MCO < accomdation.dist,
+    Frequency * 2 * gdist.MCO * conversion.factor * 4,
+
+    # Round trip driving emissions for 1 trip (Kg)
+    drive.MCO == 1 & gdist.MCO >=accomdation.dist,
     Frequency * 2 * gdist.MCO * conversion.factor,
-    Frequency * Footprint.MCO
-    )
 
-  )]
+    # Round trip flying emissions (Kg)
+    drive.MCO == 0,
+    Frequency * Footprint.MCO
+  ))
+  ]
 
 
 # Export ------------------------------------------------------------------
