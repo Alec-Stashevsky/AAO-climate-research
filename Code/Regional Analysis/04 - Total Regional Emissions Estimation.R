@@ -23,7 +23,7 @@ grams.to.kg <- 0.001
 car.emissons.grams.per.mile <- 404
 conversion.factor <- meter.to.mile * car.emissons.grams.per.mile * grams.to.kg
 
-accomdation.dist <- 17707 # Geodesic distance between SFO and OAK is used
+accomdation.dist <- 30 * 1 / meter.to.mile # Driving distance between SFO and OAK is used
 
 # Calculate Total Emissions -----------------------------------------------
 aao[, `:=`(

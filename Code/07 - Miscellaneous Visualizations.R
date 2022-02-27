@@ -121,6 +121,7 @@ emissions_plot <- function(
   region,
   offset = 0,
   binwidth = 600,
+  single.meeting.bar.col = "lightblue",
   legend.position = "bottom",
   title = NULL,
   regional = FALSE
@@ -226,7 +227,7 @@ emissions_plot <- function(
       scale_fill_manual(
         name = "Attendance at:",
         labels = c("San Francisco", "Chicago"),
-        values = c("SFO" = "#26828e", "ORD" = "#6ece58")
+        values = c("SFO" = "#22a581", "ORD" = "#dbe018")
         ) +
       guides(
         fill  = guide_legend(order = 1, title.position = "top", title.hjust = 0.5),
@@ -345,7 +346,7 @@ emissions_plot <- function(
         aes(x = get(paste0("gdist.", region)) / 1000, fill = region),
         binwidth = binwidth,
         col = "gray28",
-        alpha = 0.75
+        alpha = 0.55
       ) +
       geom_line(
         data = data[
@@ -385,7 +386,7 @@ emissions_plot <- function(
       scale_fill_manual(
         name = "Attendance at:",
         labels = conventions[IATA == region]$`Airport City`,
-        values = c(assign(region, "lightblue"))
+        values = c(assign(region, single.meeting.bar.col))
         ) +
       guides(
         fill  = guide_legend(order = 1, title.position = "top"),
@@ -406,11 +407,16 @@ pdf(file = paste0(path.viz,"AAO Cummulative Footprint Plots.pdf"),
   width = 8, height = 6)
 
 # Single-meeting plots
-emissions_plot(aao.final.expanded, "SFO")
+emissions_plot(aao.final.expanded, "SFO", single.meeting.bar.col = "#fb7000")
 emissions_plot(aao.final.expanded, "LAS")
 emissions_plot(aao.final.expanded, "MCO")
 emissions_plot(aao.final.expanded, "MSY")
-emissions_plot(aao.final.expanded, "ORD", offset = 18) # Needed to fix second y-axis labels
+emissions_plot(
+  aao.final.expanded,
+  "ORD", # Needed to fix second y-axis labels
+  offset = 18,
+  single.meeting.bar.col = "#0ebcf1"
+  )
 
 # Regional format plots
 emissions_plot(

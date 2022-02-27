@@ -94,11 +94,11 @@ legend("bottomleft",
   pch = 19,
   bty = "n",
   pt.bg = "white",
-  pt.cex = 1.1,
-  cex = 0.45,
+  pt.cex = 1.4,
+  cex = 0.8,
   text.col = "white",
   ncol = 1,
-  title = "Regional Conference")
+  title = "Conference Location")
 
 # Add title
 title(main = "Regional AAO Meeting (2 Locations)",
@@ -130,11 +130,11 @@ legend("bottomleft",
   pch = 19,
   bty = "n",
   pt.bg = "white",
-  pt.cex = 1.1,
-  cex = 0.45,
+  pt.cex = 1.4,
+  cex = 0.8,
   text.col = "white",
   ncol = 1,
-  title = "Regional Conference")
+  title = "Conference Location")
 
 # Add title
 title(main = "Regional AAO Meeting (3 Locations)",
@@ -222,11 +222,11 @@ legend("bottomleft",
   pch = 19,
   bty = "n",
   pt.bg = "white",
-  pt.cex = 1.1,
-  cex = 0.45,
+  pt.cex = 1.4,
+  cex = 0.8,
   text.col = "white",
   ncol = 1,
-  title = "Regional Conference")
+  title = "Conference Location")
 
 # Add Flight plot aesthetics
 title(main = "AAO Conference Flight Network (2 Meetings)",
@@ -255,11 +255,11 @@ legend("bottomleft",
   pch = 19,
   bty = "n",
   pt.bg = "white",
-  pt.cex = 1.1,
-  cex = 0.45,
+  pt.cex = 1.4,
+  cex = 0.8,
   text.col = "white",
   ncol = 1,
-  title = "Regional Conference")
+  title = "Conference Location")
 
 
 # Add Flight plot aesthetics
