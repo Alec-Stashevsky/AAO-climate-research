@@ -196,7 +196,7 @@ emissions_plot <- function(
           .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
             "Distance" = get(paste0("gdist.", region)))
         ],
-        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        aes(x = Distance / 1000, y = CumSum, col = "Cumulative C02 Emissions"),
         size = 1.5,
         alpha = 1
       ) +
@@ -216,12 +216,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~tCO[2]~Emissions),
+          name = expression(Cumulative~CO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~tCO[2]~Emissions),
+        labels = expression(Cumulative~CO[2]~Emissions),
         values = c("gray28")
       ) +
       scale_fill_manual(
@@ -235,7 +235,11 @@ emissions_plot <- function(
         ) +
       ggtitle(title) +
       theme_minimal() +
-      theme(legend.position = legend.position)
+      theme(
+        legend.position = legend.position,
+        axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2)
+      )
 
 
   } else if (regional & region == "2") {
@@ -276,7 +280,7 @@ emissions_plot <- function(
           .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
             "Distance" = get(paste0("gdist.", region)))
         ],
-        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        aes(x = Distance / 1000, y = CumSum, col = "Cumulative C02 Emissions"),
         size = 1.5,
         alpha = 1
 
@@ -297,12 +301,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~tCO[2]~Emissions),
+          name = expression(Cumulative~CO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~tCO[2]~Emissions),
+        labels = expression(Cumulative~CO[2]~Emissions),
         values = c("gray28")
         ) +
       scale_fill_manual(
@@ -316,7 +320,11 @@ emissions_plot <- function(
       ) +
       ggtitle(title) +
       theme_minimal() +
-      theme(legend.position = legend.position)
+      theme(
+        legend.position = legend.position,
+        axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2)
+        )
 
 
   } else {
@@ -354,7 +362,7 @@ emissions_plot <- function(
           .("CumSum" = cumsum(get(paste0("PC.Footprint.", region)) / cumsum_coef),
             "Distance" = get(paste0("gdist.", region)))
         ],
-        aes(x = Distance / 1000, y = CumSum, col = "Cummulative C02 Emissions"),
+        aes(x = Distance / 1000, y = CumSum, col = "Cumulative C02 Emissions"),
         size = 1.5,
         alpha = 1
 
@@ -375,12 +383,12 @@ emissions_plot <- function(
         breaks = seq(from = 0, to = max.bar.height, by = 1000),
         sec.axis = sec_axis(
           trans = ~.*sec_axis_trans,
-          name = expression(Cummulative~tCO[2]~Emissions),
+          name = expression(Cumulative~CO[2]~Emissions),
           labels = scales::label_percent())
       ) +
       scale_color_manual(
         name = " ",
-        labels = expression(Cummulative~tCO[2]~Emissions),
+        labels = expression(Cumulative~CO[2]~Emissions),
         values = c("gray28")
       ) +
       scale_fill_manual(
@@ -394,7 +402,11 @@ emissions_plot <- function(
         ) +
       ggtitle(title) +
       theme_minimal() +
-      theme(legend.position = legend.position)
+      theme(
+        legend.position = legend.position,
+        axis.title.x = element_text(vjust = -2),
+        axis.title.y = element_text(vjust = 2)
+      )
 
   }
 }
@@ -403,7 +415,7 @@ emissions_plot <- function(
 # Output Plots ------------------------------------------------------------
 
 # Initialize write to pdf
-pdf(file = paste0(path.viz,"AAO Cummulative Footprint Plots.pdf"),
+pdf(file = paste0(path.viz,"AAO Cumulative Footprint Plots.pdf"),
   width = 8, height = 6)
 
 # Single-meeting plots
