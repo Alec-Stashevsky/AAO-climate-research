@@ -81,22 +81,6 @@ map("state", col = "grey20", fill = TRUE, bg = "black", lwd = 0.1
   ylim = c(grid[1,2] - 3, grid[2,2] + 4)
   )
 
-points(
-  x = coordinate.rank$lon[1:3],
-  y = coordinate.rank$lat[1:3],
-  col = "orange red",
-  pch = 10, cex = 1
-  )
-
-text(
-  x = coordinate.rank$lon[1:3],
-  y = coordinate.rank$lat[1:3],
-  labels = coordinate.rank$Rank[1:3],
-  col = "white",
-  cex = 0.65,
-  pos = 1
-  )
-
 # Isolate maximum bounding polygon with best 15 approximations
 target <- c(10, 5, 8, 9, 6)
 
@@ -107,8 +91,8 @@ poly.ordering <- as.matrix(
     coordinate.rank[target[3]],
     coordinate.rank[target[4]],
     coordinate.rank[target[5]]
-    )
   )
+)
 
 # Identify the centroid/geometric median/center of mass
 region <- makePoly(poly.ordering[,1:2], sp = TRUE)
@@ -119,10 +103,48 @@ polygon(
   poly.ordering,
   col = rgb(red = 1, green = 140/255, blue = 0, alpha = 0.25),
   border = "orange"
-  )
+)
 
 # Add centroid
-points(x = center[1], y= center[2], col = "gold", pch = 3)
+# points(x = center[1], y= center[2], col = "gold", pch = 3)
+
+points(
+  x = coordinate.rank$lon[1:3],
+  y = coordinate.rank$lat[1:3],
+  col = "orange red",
+  pch = 10, cex = 1
+  )
+
+text(
+  x = coordinate.rank$lon[1:3]+ 0.15,
+  y = coordinate.rank$lat[1:3],
+  labels = coordinate.rank$Rank[1:3],
+  col = "white",
+  cex = 0.65,
+  pos = 1,
+  offset = 0.35,
+  adj = c(1, 1)
+  )
+
+
+# Plot Chicago
+points(
+  x = -87.6298,
+  y = 41.8781,
+  col = "white",
+  pch = 19,
+  cex = .4
+)
+
+text(
+  x = -87.6298,
+  y = 41.8781,
+  labels = "Chicago",
+  col = "white",
+  cex = 0.65,
+  pos = 3,
+  offset = .35
+)
 
 # Add plot aesthetics
 title(main = "AAO Meeting Optimal Location Region", col.main = "white")

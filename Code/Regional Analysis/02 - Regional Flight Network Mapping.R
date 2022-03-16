@@ -38,7 +38,7 @@ dests2 <- list("SFO", "MCO", "ORD")
 
 # Generate colors
 dest.cols <- viridis(length(dests), begin = 0.6, end = 0.95, alpha = 0.38)
-dest.cols.list <- as.list(viridis(length(dests), begin = 0.6, end = 0.95, alpha = 0.38))
+dest.cols.list <- as.list(viridis(length(dests), begin = 0.6, end = 0.95, alpha = 0.58))
 
 dest.cols2 <- viridis(length(dests2), begin = 0.6, end = 0.95, alpha = 0.38)
 dest.cols.list2 <- as.list(viridis(length(dests2), begin = 0.6, end = 0.95, alpha = 0.38))
@@ -214,6 +214,20 @@ lapply(
   cols = dest.cols.list,
   endpts = TRUE
   )
+
+
+for (i in 1:length(dests)) {
+
+  points(
+    x = aao[`Regional Format 1` == dests[[i]]]$Longitude,
+    y = aao[`Regional Format 1` == dests[[i]]]$Latitude,
+    pch=19,
+    cex = log(aao$Frequency) / (max(log(aao$Frequency)) * 4),
+    col = dest.cols[i]
+  )
+
+}
+
 
 # Add Legend
 legend("bottomleft",
