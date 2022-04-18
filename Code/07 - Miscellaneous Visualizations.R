@@ -148,6 +148,10 @@ emissions_plot <- function(
   # Round max histogram bar height to nearest thousands
   max.bar.height <- round(max(p.build[["data"]][[1]][["y"]]), digits = -3)
 
+  if (region %in% c("ORD", "SFO")) {
+    max.bar.height <- 6000
+  }
+
   # Total Emissions for region
   total.emissions <- sum(data[, .(get(paste0("PC.Footprint.", region)))])
 
